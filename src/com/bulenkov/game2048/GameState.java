@@ -19,7 +19,7 @@ interface GameState {
    * more moves are possible) and returns the state the game should be in
    * afterwards. Returns {@code this} when nothing changes.
    */
-  GameState afterBoardCheck(Game2048 game);
+  GameState afterBoardCheck(GameModel model);
 
   /** Draws this state's overlay (if any) on top of the board. */
   void drawOverlay(Graphics2D g, int width, int height, String fontName);

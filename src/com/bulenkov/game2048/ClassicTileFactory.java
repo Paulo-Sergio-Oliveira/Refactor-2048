@@ -6,7 +6,7 @@ package com.bulenkov.game2048;
  */
 class ClassicTileFactory extends TileFactory {
   @Override
-  Game2048.Tile createRandomTile() {
+  Tile createRandomTile() {
     return createTile(Math.random() < 0.9 ? 2 : 4);
   }
 }

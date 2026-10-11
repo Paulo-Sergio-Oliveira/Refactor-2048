@@ -8,51 +8,51 @@ import java.awt.event.KeyEvent;
  * to four separate {@code left()/right()/up()/down()} methods: new input
  * sources only need to resolve to a {@link Direction} (see
  * {@link #fromKeyCode(int)}), and new directions can be added here without
- * touching {@link Game2048}.
+ * touching {@link GameModel}.
  */
 enum Direction implements MoveStrategy {
   LEFT {
     @Override
-    public boolean move(Game2048 game) {
+    public boolean move(GameModel model) {
       boolean changed = false;
       for (int i = 0; i < 4; i++) {
-        Game2048.Tile[] line = game.getLine(i);
-        Game2048.Tile[] merged = game.mergeLine(game.moveLine(line));
-        game.setLine(i, merged);
-        if (!changed && !game.compare(line, merged)) {
+        Tile[] line = model.getLine(i);
+        Tile[] merged = model.mergeLine(model.moveLine(line));
+        model.setLine(i, merged);
+        if (!changed && !model.compare(line, merged)) {
           changed = true;
         }
       }
       if (changed) {
-        game.addTile();
+        model.addTile();
       }
       return changed;
     }
   },
   RIGHT {
     @Override
-    public boolean move(Game2048 game) {
-      game.setTiles(game.rotate(180));
-      boolean changed = LEFT.move(game);
-      game.setTiles(game.rotate(180));
+    public boolean move(GameModel model) {
+      model.setTiles(model.rotate(180));
+      boolean changed = LEFT.move(model);
+      model.setTiles(model.rotate(180));
       return changed;
     }
   },
   UP {
     @Override
-    public boolean move(Game2048 game) {
-      game.setTiles(game.rotate(270));
-      boolean changed = LEFT.move(game);
-      game.setTiles(game.rotate(90));
+    public boolean move(GameModel model) {
+      model.setTiles(model.rotate(270));
+      boolean changed = LEFT.move(model);
+      model.setTiles(model.rotate(90));
       return changed;
     }
   },
   DOWN {
     @Override
-    public boolean move(Game2048 game) {
-      game.setTiles(game.rotate(90));
-      boolean changed = LEFT.move(game);
-      game.setTiles(game.rotate(270));
+    public boolean move(GameModel model) {
+      model.setTiles(model.rotate(90));
+      boolean changed = LEFT.move(model);
+      model.setTiles(model.rotate(270));
       return changed;
     }
   };

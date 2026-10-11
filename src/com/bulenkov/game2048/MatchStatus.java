@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
  * Concrete states of a match: {@link #PLAYING}, {@link #WON} and
  * {@link #LOST}. Only {@link #PLAYING} ever transitions away (to
  * {@link #LOST} when the board becomes unplayable, or to {@link #WON} when
- * {@code Game2048} reaches the 2048 tile) - once the match is won or lost it
+ * {@link GameModel} reaches the 2048 tile) - once the match is won or lost it
  * stays that way, which also fixes a latent inconsistency in the original
  * flag-based code: reaching 2048 on a now-full, unmovable board used to set
  * both {@code myWin} and {@code myLose} to {@code true} at once, drawing
@@ -22,8 +22,8 @@ enum MatchStatus implements GameState {
     }
 
     @Override
-    public GameState afterBoardCheck(Game2048 game) {
-      return game.canMove() ? this : LOST;
+    public GameState afterBoardCheck(GameModel model) {
+      return model.canMove() ? this : LOST;
     }
 
     @Override
@@ -38,7 +38,7 @@ enum MatchStatus implements GameState {
     }
 
     @Override
-    public GameState afterBoardCheck(Game2048 game) {
+    public GameState afterBoardCheck(GameModel model) {
       return this;
     }
 
@@ -55,7 +55,7 @@ enum MatchStatus implements GameState {
     }
 
     @Override
-    public GameState afterBoardCheck(Game2048 game) {
+    public GameState afterBoardCheck(GameModel model) {
       return this;
     }
 
