@@ -34,6 +34,7 @@ public class Game2048 extends JPanel {
   private static final int TILES_MARGIN = 16;
 
   private Tile[] myTiles;
+  private final TileFactory myTileFactory = new ClassicTileFactory();
   boolean myWin = false;
   boolean myLose = false;
   int myScore = 0;
@@ -74,7 +75,7 @@ public class Game2048 extends JPanel {
     myLose = false;
     myTiles = new Tile[4 * 4];
     for (int i = 0; i < myTiles.length; i++) {
-      myTiles[i] = new Tile();
+      myTiles[i] = myTileFactory.createEmptyTile();
     }
     addTile();
     addTile();
@@ -89,26 +90,25 @@ public class Game2048 extends JPanel {
   }
 
   void addTile() {
-    List<Tile> list = availableSpace();
-    if (!availableSpace().isEmpty()) {
-      int index = (int) (Math.random() * list.size()) % list.size();
-      Tile emptyTime = list.get(index);
-      emptyTime.value = Math.random() < 0.9 ? 2 : 4;
+    List<Integer> emptyIndices = availableIndices();
+    if (!emptyIndices.isEmpty()) {
+      int index = (int) (Math.random() * emptyIndices.size()) % emptyIndices.size();
+      myTiles[emptyIndices.get(index)] = myTileFactory.createRandomTile();
     }
   }
 
-  private List<Tile> availableSpace() {
-    final List<Tile> list = new ArrayList<Tile>(16);
-    for (Tile t : myTiles) {
-      if (t.isEmpty()) {
-        list.add(t);
+  private List<Integer> availableIndices() {
+    final List<Integer> indices = new ArrayList<Integer>(16);
+    for (int i = 0; i < myTiles.length; i++) {
+      if (myTiles[i].isEmpty()) {
+        indices.add(i);
       }
     }
-    return list;
+    return indices;
   }
 
   private boolean isFull() {
-    return availableSpace().size() == 0;
+    return availableIndices().isEmpty();
   }
 
   boolean canMove() {
@@ -195,7 +195,7 @@ public class Game2048 extends JPanel {
         }
         i++;
       }
-      list.add(new Tile(num));
+      list.add(myTileFactory.createTile(num));
     }
     if (list.size() == 0) {
       return oldLine;
@@ -205,9 +205,9 @@ public class Game2048 extends JPanel {
     }
   }
 
-  private static void ensureSize(java.util.List<Tile> l, int s) {
+  private void ensureSize(java.util.List<Tile> l, int s) {
     while (l.size() != s) {
-      l.add(new Tile());
+      l.add(myTileFactory.createEmptyTile());
     }
   }
 
