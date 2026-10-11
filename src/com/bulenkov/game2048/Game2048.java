@@ -35,8 +35,7 @@ public class Game2048 extends JPanel {
 
   private Tile[] myTiles;
   private final TileFactory myTileFactory = new ClassicTileFactory();
-  boolean myWin = false;
-  boolean myLose = false;
+  private GameState myGameState = MatchStatus.PLAYING;
   int myScore = 0;
 
   public Game2048() {
@@ -48,20 +47,16 @@ public class Game2048 extends JPanel {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
           resetGame();
         }
-        if (!canMove()) {
-          myLose = true;
-        }
+        myGameState = myGameState.afterBoardCheck(Game2048.this);
 
-        if (!myWin && !myLose) {
+        if (myGameState.acceptsMoves()) {
           Direction direction = Direction.fromKeyCode(e.getKeyCode());
           if (direction != null) {
             direction.move(Game2048.this);
           }
         }
 
-        if (!myWin && !canMove()) {
-          myLose = true;
-        }
+        myGameState = myGameState.afterBoardCheck(Game2048.this);
 
         repaint();
       }
@@ -71,8 +66,7 @@ public class Game2048 extends JPanel {
 
   public void resetGame() {
     myScore = 0;
-    myWin = false;
-    myLose = false;
+    myGameState = MatchStatus.PLAYING;
     myTiles = new Tile[4 * 4];
     for (int i = 0; i < myTiles.length; i++) {
       myTiles[i] = myTileFactory.createEmptyTile();
@@ -191,7 +185,7 @@ public class Game2048 extends JPanel {
         myScore += num;
         int ourTarget = 2048;
         if (num == ourTarget) {
-          myWin = true;
+          myGameState = MatchStatus.WON;
         }
         i++;
       }
@@ -258,23 +252,11 @@ public class Game2048 extends JPanel {
     if (value != 0)
       g.drawString(s, xOffset + (TILE_SIZE - w) / 2, yOffset + TILE_SIZE - (TILE_SIZE - h) / 2 - 2);
 
-    if (myWin || myLose) {
-      g.setColor(new Color(255, 255, 255, 30));
-      g.fillRect(0, 0, getWidth(), getHeight());
-      g.setColor(new Color(78, 139, 202));
-      g.setFont(new Font(FONT_NAME, Font.BOLD, 48));
-      if (myWin) {
-        g.drawString("You won!", 68, 150);
-      }
-      if (myLose) {
-        g.drawString("Game over!", 50, 130);
-        g.drawString("You lose!", 64, 200);
-      }
-      if (myWin || myLose) {
-        g.setFont(new Font(FONT_NAME, Font.PLAIN, 16));
-        g.setColor(new Color(128, 128, 128, 128));
-        g.drawString("Press ESC to play again", 80, getHeight() - 40);
-      }
+    myGameState.drawOverlay(g, getWidth(), getHeight(), FONT_NAME);
+    if (!myGameState.acceptsMoves()) {
+      g.setFont(new Font(FONT_NAME, Font.PLAIN, 16));
+      g.setColor(new Color(128, 128, 128, 128));
+      g.drawString("Press ESC to play again", 80, getHeight() - 40);
     }
     g.setFont(new Font(FONT_NAME, Font.PLAIN, 18));
     g.drawString("Score: " + myScore, 200, 365);
