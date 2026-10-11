@@ -52,19 +52,9 @@ public class Game2048 extends JPanel {
         }
 
         if (!myWin && !myLose) {
-          switch (e.getKeyCode()) {
-            case KeyEvent.VK_LEFT:
-              left();
-              break;
-            case KeyEvent.VK_RIGHT:
-              right();
-              break;
-            case KeyEvent.VK_DOWN:
-              down();
-              break;
-            case KeyEvent.VK_UP:
-              up();
-              break;
+          Direction direction = Direction.fromKeyCode(e.getKeyCode());
+          if (direction != null) {
+            direction.move(Game2048.this);
           }
         }
 
@@ -90,45 +80,15 @@ public class Game2048 extends JPanel {
     addTile();
   }
 
-  public void left() {
-    boolean needAddTile = false;
-    for (int i = 0; i < 4; i++) {
-      Tile[] line = getLine(i);
-      Tile[] merged = mergeLine(moveLine(line));
-      setLine(i, merged);
-      if (!needAddTile && !compare(line, merged)) {
-        needAddTile = true;
-      }
-    }
-
-    if (needAddTile) {
-      addTile();
-    }
-  }
-
-  public void right() {
-    myTiles = rotate(180);
-    left();
-    myTiles = rotate(180);
-  }
-
-  public void up() {
-    myTiles = rotate(270);
-    left();
-    myTiles = rotate(90);
-  }
-
-  public void down() {
-    myTiles = rotate(90);
-    left();
-    myTiles = rotate(270);
+  void setTiles(Tile[] tiles) {
+    myTiles = tiles;
   }
 
   private Tile tileAt(int x, int y) {
     return myTiles[x + y * 4];
   }
 
-  private void addTile() {
+  void addTile() {
     List<Tile> list = availableSpace();
     if (!availableSpace().isEmpty()) {
       int index = (int) (Math.random() * list.size()) % list.size();
@@ -167,7 +127,7 @@ public class Game2048 extends JPanel {
     return false;
   }
 
-  private boolean compare(Tile[] line1, Tile[] line2) {
+  boolean compare(Tile[] line1, Tile[] line2) {
     if (line1 == line2) {
       return true;
     } else if (line1.length != line2.length) {
@@ -182,7 +142,7 @@ public class Game2048 extends JPanel {
     return true;
   }
 
-  private Tile[] rotate(int angle) {
+  Tile[] rotate(int angle) {
     Tile[] newTiles = new Tile[4 * 4];
     int offsetX = 3, offsetY = 3;
     if (angle == 90) {
@@ -204,7 +164,7 @@ public class Game2048 extends JPanel {
     return newTiles;
   }
 
-  private Tile[] moveLine(Tile[] oldLine) {
+  Tile[] moveLine(Tile[] oldLine) {
     LinkedList<Tile> l = new LinkedList<Tile>();
     for (int i = 0; i < 4; i++) {
       if (!oldLine[i].isEmpty())
@@ -222,7 +182,7 @@ public class Game2048 extends JPanel {
     }
   }
 
-  private Tile[] mergeLine(Tile[] oldLine) {
+  Tile[] mergeLine(Tile[] oldLine) {
     LinkedList<Tile> list = new LinkedList<Tile>();
     for (int i = 0; i < 4 && !oldLine[i].isEmpty(); i++) {
       int num = oldLine[i].value;
@@ -251,7 +211,7 @@ public class Game2048 extends JPanel {
     }
   }
 
-  private Tile[] getLine(int index) {
+  Tile[] getLine(int index) {
     Tile[] result = new Tile[4];
     for (int i = 0; i < 4; i++) {
       result[i] = tileAt(i, index);
@@ -259,7 +219,7 @@ public class Game2048 extends JPanel {
     return result;
   }
 
-  private void setLine(int index, Tile[] re) {
+  void setLine(int index, Tile[] re) {
     System.arraycopy(re, 0, myTiles, index * 4, 4);
   }
 
